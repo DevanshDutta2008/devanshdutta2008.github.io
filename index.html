@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Devansh Dutta — Personal Portfolio</title>
+  <meta name="description" content="Personal portfolio showcasing skills, projects and contact. Responsive, light/dark themes, CSS animations, Flexbox & Grid." />
+  <style>
+    /* Loading Screen Styles */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    .dark #loading-screen {
+      background: linear-gradient(135deg, #1e3a8a 0%, #0f766e 100%);
+    }
+
+    #loading-screen.fade-out {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loading-container {
+      text-align: center;
+      color: white;
+    }
+
+    .logo-loader {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 30px;
+      position: relative;
+    }
+
+    .logo-inner {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+      animation: logoPulse 2s ease-in-out infinite;
+      box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+    }
+
+    .logo-glow {
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      right: -5px;
+      bottom: -5px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      border-radius: 25px;
+      filter: blur(15px);
+      opacity: 0.5;
+      animation: logoPulse 2s ease-in-out infinite alternate;
+      z-index: -1;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+      }
+      50% { 
+        transform: scale(1.1);
+        box-shadow: 0 15px 40px rgba(37, 99, 235, 0.5);
+      }
+    }
+
+    .loading-text {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      background: linear-gradient(45deg, #fff, #e0f2fe, #fff);
+      background-size: 200% 200%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: textShine 2s ease-in-out infinite;
+    }
+
+    @keyframes textShine {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .loading-bar-container {
+      width: 300px;
+      height: 6px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    .loading-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      border-radius: 10px;
+      animation: loadingProgress 2.5s ease-in-out forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @keyframes loadingProgress {
+      0% { width: 0%; }
+      20% { width: 25%; }
+      40% { width: 50%; }
+      60% { width: 75%; }
+      80% { width: 90%; }
+      100% { width: 100%; }
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    .loading-dots {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: white;
+      animation: dotFloat 1.4s ease-in-out infinite both;
+    }
+
+    .dot:nth-child(1) { animation-delay: -0.32s; }
+    .dot:nth-child(2) { animation-delay: -0.16s; }
+    .dot:nth-child(3) { animation-delay: 0s; }
+
+    @keyframes dotFloat {
+      0%, 80%, 100% {
+        transform: translateY(0px);
+        opacity: 0.7;
+      }
+      40% {
+        transform: translateY(-10px);
+        opacity: 1;
+      }
+    }
+
+    .loading-quote {
+      margin-top: 30px;
+      font-size: 14px;
+      opacity: 0.8;
+      font-style: italic;
+      max-width: 300px;
+      line-height: 1.4;
+    }
+
+    /* Hide main content initially */
+    #main-content {
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    #main-content.loaded {
+      opacity: 1;
+    }
+
+    /* Rest of your existing styles... */
+    :root{
+      --bg: #f7f9fc;
+      --card: #ffffff;
+      --text: #0f1724;
+      --muted: #51637a;
+      --accent: #2563eb;
+      --accent-2: #06b6d4;
+      --glass: rgba(255,255,255,0.6);
+      --radius: 14px;
+      --shadow: 0 6px 18px rgba(16,24,40,0.08);
+    }
+    .dark{
+      --bg: #071129;
+      --card: #071f2f;
+      --text: #e6eef6;
+      --muted: #9fb7cf;
+      --accent: #60a5fa;
+      --accent-2: #2dd4bf;
+      --glass: rgba(255,255,255,0.04);
+      --shadow: 0 8px 30px rgba(2,6,23,0.6);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(-45deg, #f7f9fc, #e3f2fd, #f3e5f5, #e8f5e8);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      line-height:1.45;
+      transition: background 0.5s, color 0.5s;
+      padding:24px;
+    }
+    .dark body{
+      background: linear-gradient(-45deg, #071129, #0d1b2a, #1b263b, #415a77);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+    }
+    header{
+      position:sticky;top:18px;z-index:40;
+      backdrop-filter: blur(6px);
+      background: linear-gradient(180deg,var(--glass), rgba(0,0,0,0));
+      padding:10px;border-radius:12px;box-shadow:var(--shadow);
+      margin-bottom:22px;
+    }
+    nav{
+      display:flex;align-items:center;justify-content:space-between;gap:12px
+    }
+    .brand{
+      display:flex;gap:12px;align-items:center
+    }
+    .logo{
+      width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:grid;place-items:center;color:white;font-weight:700;box-shadow:0 4px 14px rgba(37,99,235,0.18)
+    }
+    .brand h1{font-size:16px;margin:0}
+    .nav-links{display:flex;gap:10px;align-items:center}
+    .nav-links a{color:var(--muted);text-decoration:none;padding:8px 10px;border-radius:8px;transition:all .2s}
+    .nav-links a:hover{color:var(--text);background:rgba(0,0,0,0.04)}
+    .theme-switch{display:flex;align-items:center;gap:8px}
+    .toggle-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 60px;
+      height: 30px;
+      background: #ddd;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 3px;
+      transition: background 0.5s;
+      z-index: 1000;
+    }
+    .dark .toggle-btn {
+      background: #333;
+    }
+    .toggle-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      transition: transform 0.5s ease, background 0.5s ease;
+    }
+    .dark .toggle-circle {
+      transform: translateX(30px);
+      background: #000;
+      color: #ffd700;
+    }
+    .sun { display: block; }
+    .moon { display: none; }
+    .dark .sun { display: none; }
+    .dark .moon { display: block; }
+    .hero{
+      display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:center;margin-bottom:28px
+    }
+    .intro-card{background:var(--card);padding:28px;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .intro h2{margin:0 0 8px 0;font-size:28px}
+    .intro p{margin:0 0 14px;color:var(--muted)}
+    .cta{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;text-decoration:none}
+    .profile-image-section {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .profile-img {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid var(--accent);
+      box-shadow: var(--shadow);
+      transition: transform 0.3s ease;
+    }
+    .profile-img:hover {
+      transform: scale(1.05);
+    }
+    .profile{
+      background:linear-gradient(180deg,rgba(255,255,255,0.06),transparent);padding:18px;border-radius:12px;display:flex;gap:12px;align-items:center;justify-content:flex-start
+    }
+    .avatar{width:80px;height:80px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:white;font-weight:700;font-size:28px}
+    .meta small{color:var(--muted)}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+    .intro-card, .profile{animation:fadeInUp .55s ease both}
+    .skills{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin:24px 0}
+    .skill{background:var(--card);padding:12px;border-radius:12px;box-shadow:var(--shadow)}
+    .skill .bar{height:10px;background:rgba(8,16,30,0.06);border-radius:999px;overflow:hidden;margin-top:8px}
+    .skill .bar > i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:999px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+    .skill.progress-100 .bar>i{width:100%}
+    .skill.progress-30 .bar>i{width:30%}
+    .skill.progress-20 .bar>i{width:20%}
+    .projects{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .project{background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform .2s,box-shadow .2s}
+    .project:hover{transform:translateY(-6px)}
+    .project .thumb{height:130px;border-radius:10px;background:linear-gradient(135deg, rgba(37,99,235,0.12), rgba(6,182,212,0.08));display:grid;place-items:center;color:var(--accent)}
+    .learning-animation {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .pulse-dots {
+      display: flex;
+      gap: 4px;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .pulse-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .pulse-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+    }
+    form{display:grid;gap:10px}
+    input,textarea{
+      padding:10px;
+      border-radius:8px;
+      border:1px solid rgba(0,0,0,0.15);
+      background:var(--card);
+      color:var(--text);
+      font-family: inherit;
+    }
+    textarea {
+      resize: none;
+    }
+    input::placeholder, textarea::placeholder {
+      color: var(--muted);
+      opacity: 0.8;
+    }
+    button.submit{padding:10px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;cursor:pointer}
+    footer{margin-top:28px;text-align:center;color:var(--muted)}
+    .widget {
+      background: var(--card);
+      padding: 12px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      height: 100%;
+    }
+    .widget-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .clock-time {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .clock-day {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .availability {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .available {
+      color: #10b981;
+    }
+    .unavailable {
+      color: #ef4444;
+    }
+    .weather-icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .weather-temp {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .weather-desc {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .loading {
+      font-size: 13px;
+      color: var(--muted);
+      font-style: italic;
+    }
+    @media (max-width:980px){
+      .hero{grid-template-columns:1fr;}
+      .projects{grid-template-columns:repeat(2,1fr)}
+      .skills{grid-template-columns:1fr}
+    }
+    @media (max-width:560px){
+      body{padding:16px}
+      .projects{grid-template-columns:1fr}
+      .brand h1{display:none}
+      .logo{width:42px;height:42px}
+      .profile-img {
+        width: 140px;
+        height: 140px;
+      }
+      .toggle-btn {
+        top: 10px;
+        right: 10px;
+        width: 50px;
+        height: 25px;
+      }
+      .toggle-circle {
+        width: 20px;
+        height: 20px;
+        font-size: 12px;
+      }
+      .dark .toggle-circle {
+        transform: translateX(25px);
+      }
+      .loading-text {
+        font-size: 20px;
+      }
+      .loading-bar-container {
+        width: 250px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="loading-container">
+      <div class="logo-loader">
+        <div class="logo-inner">DD</div>
+        <div class="logo-glow"></div>
+      </div>
+      <div class="loading-text">Devansh Dutta</div>
+      <div class="loading-bar-container">
+        <div class="loading-bar"></div>
+      </div>
+      <div class="loading-dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div class="loading-quote">Crafting digital experiences with code</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main-content">
+    <div class="container">
+      <button class="toggle-btn" id="theme-toggle-btn">
+        <div class="toggle-circle">
+          <span class="sun">☀️</span>
+          <span class="moon">🌙</span>
+        </div>
+      </button>
+      <header>
+        <nav>
+          <div class="brand">
+            <div class="logo">
+              <img src="./logo.png" style="width:100%;height:100%;border-radius:12px;object-fit:cover">
+            </div>
+            <div>
+              <h1>Devansh Dutta</h1>
+              <small style="color:var(--muted);">Full Stack Developer — Problem Solver</small>
+            </div>
+          </div>
+          <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#projects">Projects</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </nav>
+      </header>
+      <main>
+        <section class="hero" id="home">
+          <article class="intro-card">
+            <div class="intro">
+              <div class="profile-image-section">
+                <img src="./pfp.png" 
+                     alt="Devansh Dutta" 
+                     class="profile-img">
+              </div>
+              <h2>Hey — I'm Devansh. I craft digital experiences with code.</h2>
+              <p>Full-stack developer specializing in MERN stack, Python automation, and scalable solutions. Passionate about creating efficient, user-centric applications.</p>
+              <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:14px">
+                <a class="cta" href="#projects">See projects</a>
+                <a style="padding:10px 14px;border-radius:10px;border:1px solid rgba(0,0,0,0.06);text-decoration:none;color:var(--text)" href="#contact">Contact me</a>
+              </div>
+              <div class="learning-animation">
+                <div class="pulse-dots">
+                  <div class="pulse-dot"></div>
+                  <div class="pulse-dot"></div>
+                  <div class="pulse-dot"></div>
+                </div>
+                <small style="color:var(--muted)">Currently mastering JavaScript with Python, Java, and MySQL integration</small>
+              </div>
+            </div>
+          </article>
+          <aside>
+            <div class="profile">
+              <img src="./pfp2.jpg" alt="Devansh Dutta" class="avatar" style="object-fit:cover">
+              <div class="meta">
+                <div style="font-weight:600">Devansh D.</div>
+                <small>17 · Bengaluru</small>
+                <div style="margin-top:8px;color:var(--muted);font-size:13px">Developer & problem solver — building solutions that matter.</div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+              <div class="widget">
+                <div class="widget-title">Current Time</div>
+                <div class="clock-time" id="current-time">--:--</div>
+                <div class="clock-day" id="current-day">--</div>
+                <div class="availability" id="availability-status">Checking availability...</div>
+              </div>
+              <div class="widget">
+                <div class="widget-title">Local Weather</div>
+                <div class="weather-icon" id="weather-icon">⛅</div>
+                <div class="weather-temp" id="weather-temp">--°C</div>
+                <div class="weather-desc" id="weather-desc">Loading weather...</div>
+              </div>
+            </div>
+          </aside>
+        </section>
+        <section id="about" style="margin-bottom:18px">
+          <div class="intro-card">
+            <h3>About</h3>
+            <p style="color:var(--muted)">I build robust applications using modern technologies. My focus is on creating efficient, scalable solutions with clean code and intuitive user interfaces.</p>
+            <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:12px">
+              <div style="min-width:220px;flex:1;background:var(--card);padding:12px;border-radius:10px;box-shadow:var(--shadow)">
+                <strong>Education</strong>
+                <div style="color:var(--muted);font-size:13px">Self-taught + coursework</div>
+              </div>
+              <div style="min-width:220px;flex:1;background:var(--card);padding:12px;border-radius:10px;box-shadow:var(--shadow)">
+                <strong>Interests</strong>
+                <div style="color:var(--muted);font-size:13px">Full-stack development, automation, AI integration</div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section id="skills">
+          <h3 style="margin-bottom:8px">Skills</h3>
+          <div class="skills">
+            <div class="skill progress-100">
+              <strong>HTML + CSS</strong>
+              <div class="bar"><i></i></div>
+            </div>
+            <div class="skill progress-30">
+              <strong>Python</strong>
+              <div class="bar"><i></i></div>
+            </div>
+            <div class="skill progress-20">
+              <strong>Java</strong>
+              <div class="bar"><i></i></div>
+            </div>
+            <div class="skill progress-30">
+              <strong>MySQL</strong>
+              <div class="bar"><i></i></div>
+            </div>
+          </div>
+        </section>
+        <section id="projects" style="margin-top:12px">
+          <h3 style="margin-bottom:10px">Projects</h3>
+          <div class="projects">
+            <article class="project">
+              <div class="thumb">WSMS</div>
+              <div>
+                <strong>Wholesale Management System</strong>
+                <div style="color:var(--muted);font-size:13px">Integrated with Python and MySQL to connect Customers and Wholesale retailers</div>
+              </div>
+            </article>
+            <article class="project">
+              <div class="thumb">Facial Recognition</div>
+              <div>
+                <strong>Facial Recognition Attendance</strong>
+                <div style="color:var(--muted);font-size:13px">Using Python's Libraries, marking attendance at office became a lot more easier</div>
+              </div>
+            </article>
+            <article class="project">
+              <div class="thumb">Portfolio</div>
+              <div>
+                <strong>Interactive Portfolio</strong>
+                <div style="color:var(--muted);font-size:13px">Using the knowledge of HTML CSS and JS, the best interactive Portfolio you will ever see</div>
+              </div>
+            </article>
+          </div>
+        </section>
+        <section id="contact" style="margin-top:18px">
+          <h3>Contact</h3>
+          <div style="display:grid;grid-template-columns:1fr 360px;gap:16px">
+            <form onsubmit="event.preventDefault();alert('Thanks — form is demo-only in this static build.')">
+              <input type="text" placeholder="Your name" required />
+              <input type="email" placeholder="Your email" required />
+              <textarea rows="5" placeholder="Message"></textarea>
+              <button class="submit" type="submit">Send message</button>
+            </form>
+            <div style="background:var(--card);padding:14px;border-radius:12px;box-shadow:var(--shadow)">
+              <strong>Quick info</strong>
+              <p style="color:var(--muted);font-size:13px">Email: devanshdtt@gmail.com<br/>Location: Bengaluru</p>
+              <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+                <a href="https://instagram.com/yourusername" style="text-decoration:none;padding:8px 12px;border-radius:8px;background:linear-gradient(45deg, #E1306C, #F77737);color:white;display:flex;align-items:center;gap:6px">
+                  <span>📷</span> Instagram
+                </a>
+                <a href="https://linkedin.com/in/yourusername" style="text-decoration:none;padding:8px 12px;border-radius:8px;background:linear-gradient(45deg, #0077B5, #00A0DC);color:white;display:flex;align-items:center;gap:6px">
+                  <span>💼</span> LinkedIn
+                </a>
+                <a href="https://github.com/yourusername" style="text-decoration:none;padding:8px 12px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);color:var(--text);display:flex;align-items:center;gap:6px">
+                  <span>🐙</span> GitHub
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+        <footer>
+          <small>Built by @devanshdutta8308 ;)</small>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    // Loading screen functionality
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const loadingScreen = document.getElementById('loading-screen');
+        const mainContent = document.getElementById('main-content');
+        
+        loadingScreen.classList.add('fade-out');
+        mainContent.classList.add('loaded');
+        
+        setTimeout(function() {
+          loadingScreen.style.display = 'none';
+        }, 800);
+      }, 2500); // Show loading screen for 2.5 seconds
+    });
+
+    // Rest of your existing JavaScript...
+    function updateClock() {
+      const now = new Date();
+      const timeElement = document.getElementById('current-time');
+      const dayElement = document.getElementById('current-day');
+      const availabilityElement = document.getElementById('availability-status');
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      timeElement.textContent = `${hours}:${minutes}`;
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      dayElement.textContent = days[now.getDay()];
+      const currentHour = now.getHours();
+      const currentDay = now.getDay();
+      const isWeekday = currentDay >= 1 && currentDay <= 5;
+      const isAvailableTime = currentHour >= 10 && currentHour < 18;
+      if (isWeekday && isAvailableTime) {
+        availabilityElement.textContent = "I'm available now!";
+        availabilityElement.className = "availability available";
+      } else {
+        let nextAvailableDay = currentDay;
+        let nextAvailableHour = 10;
+        if (currentHour >= 18 || !isWeekday) {
+          nextAvailableDay = (currentDay + 1) % 7;
+          if (nextAvailableDay === 0) nextAvailableDay = 1;
+        } else if (currentHour < 10) {
+          nextAvailableHour = 10;
+        }
+        const nextAvailableDate = new Date(now);
+        const daysToAdd = (nextAvailableDay - currentDay + 7) % 7;
+        nextAvailableDate.setDate(now.getDate() + daysToAdd);
+        nextAvailableDate.setHours(nextAvailableHour, 0, 0, 0);
+        const nextDay = days[nextAvailableDate.getDay()];
+        const nextTime = `${nextAvailableHour}:00`;
+        availabilityElement.textContent = `Next available: ${nextDay} at ${nextTime}`;
+        availabilityElement.className = "availability unavailable";
+      }
+    }
+
+    function getWeather() {
+      const tempElement = document.getElementById('weather-temp');
+      const descElement = document.getElementById('weather-desc');
+      const iconElement = document.getElementById('weather-icon');
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const apiKey = '33789d03e797912a047a55e338458322';
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+            fetch(apiUrl)
+              .then(response => response.json())
+              .then(data => {
+                const temp = Math.round(data.main.temp);
+                const description = data.weather[0].description;
+                const iconCode = data.weather[0].icon;
+                tempElement.textContent = `${temp}°C`;
+                descElement.textContent = description;
+                const iconMap = {
+                  '01d': '☀️', '01n': '🌙',
+                  '02d': '⛅', '02n': '☁️',
+                  '03d': '☁️', '03n': '☁️',
+                  '04d': '☁️', '04n': '☁️',
+                  '09d': '🌧️', '09n': '🌧️',
+                  '10d': '🌦️', '10n': '🌦️',
+                  '11d': '⛈️', '11n': '⛈️',
+                  '13d': '❄️', '13n': '❄️',
+                  '50d': '🌫️', '50n': '🌫️'
+                };
+                iconElement.textContent = iconMap[iconCode] || '⛅';
+              })
+              .catch(error => {
+                console.error('Error fetching weather:', error);
+                tempElement.textContent = '--°C';
+                descElement.textContent = 'Weather unavailable';
+                iconElement.textContent = '❓';
+              });
+          },
+          error => {
+            console.error('Geolocation error:', error);
+            tempElement.textContent = '--°C';
+            descElement.textContent = 'Location required';
+            iconElement.textContent = '📍';
+          }
+        );
+      } else {
+        tempElement.textContent = '--°C';
+        descElement.textContent = 'Geolocation not supported';
+        iconElement.textContent = '❓';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateClock();
+      setInterval(updateClock, 60000);
+      getWeather();
+      const toggleBtn = document.getElementById('theme-toggle-btn');
+      const saved = localStorage.getItem('theme');
+      if(saved === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+      toggleBtn.addEventListener('click', ()=>{
+        document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark')? 'dark' : 'light');
+      });
+    });
+  </script>
+</body>
+</html>
